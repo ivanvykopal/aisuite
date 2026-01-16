@@ -44,8 +44,8 @@ ollama = []
 openai = ["openai"]
 watsonx = ["ibm-watsonx-ai"]
 mcp = ["mcp", "nest-asyncio"]
-vllm = ["vllm"]
-all = ["anthropic", "boto3", "cerebras_cloud_sdk", "vertexai", "google-cloud-speech", "groq", "mistralai", "openai", "cohere", "ibm-watsonx-ai", "deepgram-sdk", "soundfile", "scipy", "numpy", "mcp", "nest-asyncio", "vllm"]  # To install all providers
+vllm = ["vllm", "bitsandbytes"]
+all = ["anthropic", "boto3", "cerebras_cloud_sdk", "vertexai", "google-cloud-speech", "groq", "mistralai", "openai", "cohere", "ibm-watsonx-ai", "deepgram-sdk", "soundfile", "scipy", "numpy", "mcp", "nest-asyncio", "vllm", "bitsandbytes"]  # To install all providers
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.7.1"

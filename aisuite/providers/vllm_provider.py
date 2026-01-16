@@ -9,15 +9,18 @@ class VllmProvider(Provider):
     def __init__(self):
         self.llm = None
     
-    def load_llm(self, model_name: str):
+    def load_llm(self, model_name: str, quanization: str = None):
         if self.llm is None:
-            self.llm = LLM(model_name)
+            if quanization:
+                self.llm = LLM(model_name, quantization=quanization)
+            else:
+                self.llm = LLM(model_name)
         
     def chat_completions_create(self, model, messages, **kwargs):
-        self.load_llm(model)
+        quantization = kwargs.get("quantization", None)
+        self.load_llm(model, quantization)
         
         sampling_params = self.llm.get_default_sampling_params()
-        print(sampling_params)
         
         if "temperature" in kwargs:
             sampling_params.temperature = kwargs["temperature"]
