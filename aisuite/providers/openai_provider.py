@@ -1,3 +1,4 @@
+from aisuite.utils.config import Config
 import openai
 import os
 from typing import Union, BinaryIO, AsyncGenerator
@@ -35,16 +36,49 @@ class OpenaiProvider(Provider):
         # Initialize audio functionality
         super().__init__()
         self.audio = OpenAIAudio(self.client)
+        
+    def _normalize_parameters(self, **kwargs):
+        config = Config(**kwargs)
+        return {
+            "audio": config.audio,
+            "frequency_penalty": config.frequency_penalty,
+            "logit_bias": config.logit_bias,
+            "logprobs": config.logprobs,
+            "max_completion_tokens": config.max_completion_tokens,
+            "metadata": config.metadata,
+            "modalities": config.modalities,
+            "n": config.n,
+            "parallel_tool_calls": config.parallel_tool_calls,
+            "prediction": config.prediction,
+            "presence_penalty": config.presence_penalty,
+            "prompt_cache_key": config.prompt_cache_key,
+            "prompt_cache_retention": config.prompt_cache_retention,
+            "reasoning_effort": config.reasoning_effort,
+            "response_format": config.response_format,
+            "safety_identifier": config.safety_identifier,
+            "stop": config.stop,
+            "store": config.store,
+            "stream": config.stream,
+            "stream_options": config.stream_options,
+            "temperature": config.temperature,
+            "tool_choice": config.tool_choice,
+            "tools": config.tools,
+            "top_logprobs": config.top_logprobs,
+            "top_p": config.top_p,
+            "verbosity": config.verbosity,
+            "web_search_options": config.web_search_options,
+        }
 
     def chat_completions_create(self, model, messages, **kwargs):
         # Any exception raised by OpenAI will be returned to the caller.
         # Maybe we should catch them and raise a custom LLMError.
+        params = self._normalize_parameters(**kwargs)
         try:
             transformed_messages = self.transformer.convert_request(messages)
             response = self.client.chat.completions.create(
                 model=model,
                 messages=transformed_messages,
-                **kwargs,  # Pass any additional arguments to the OpenAI API
+                **{k: v for k, v in params.items() if v is not None},
             )
             return response
         except Exception as e:

@@ -1,4 +1,4 @@
-from aisuite.framework.choice import Choice
+from aisuite.utils.config import Config
 from aisuite.framework.message import CompletionUsage
 from aisuite.provider import Provider
 from aisuite.framework import ChatCompletionResponse
@@ -15,21 +15,39 @@ class VllmProvider(Provider):
                 self.llm = LLM(model_name, quantization=quanization)
             else:
                 self.llm = LLM(model_name)
+                
+    def _normalize_parameters(self, **kwargs):
+        # kwargs should have only attributes defined in Config if there is any extra attribute, it will raise an error, all missing should be filled with default value
+        config = Config(**kwargs)
+        
+        return {
+            "quantization": config.quantization,
+            "n": config.n,
+            "best_of": config.best_of,
+            "presence_penalty": config.presence_penalty,
+            "frequency_penalty": config.frequency_penalty,
+            "repetition_penalty": config.repetition_penalty,
+            "temperature": config.temperature,
+            "top_p": config.top_p,
+            "top_k": config.top_k,
+            "min_p": config.min_p,
+            "seed": config.seed,
+            "stop": config.stop,
+            "max_tokens": config.max_completion_tokens,
+            "min_tokens": config.min_tokens,
+            "skip_special_tokens": config.skip_special_tokens,
+            "logit_bias": config.logit_bias,
+        }
         
     def chat_completions_create(self, model, messages, **kwargs):
-        quantization = kwargs.get("quantization", None)
-        self.load_llm(model, quantization)
+        params = self._normalize_parameters(**kwargs)
+        self.load_llm(model, params.pop("quantization"))
         
         sampling_params = self.llm.get_default_sampling_params()
-        
-        if "temperature" in kwargs:
-            sampling_params.temperature = kwargs["temperature"]
-        if "top_p" in kwargs:
-            sampling_params.top_p = kwargs["top_p"]
-        if "max_tokens" in kwargs:
-            sampling_params.max_tokens = kwargs["max_tokens"]
-        if "top_k" in kwargs:
-            sampling_params.top_k = kwargs["top_k"]
+        for key, value in params.items():
+            if value is not None:
+                # sampling param is not dict but object with attributes
+                setattr(sampling_params, key, value)
             
         outputs = self.llm.chat(
             messages=messages,

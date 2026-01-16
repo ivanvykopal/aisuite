@@ -4,6 +4,7 @@ import importlib
 import os
 import functools
 from typing import Union, BinaryIO, Optional
+from aisuite.utils.config import Config
 
 
 class LLMError(Exception):
@@ -26,9 +27,17 @@ class Provider(ABC):
         self.audio: Optional[Audio] = None
 
     @abstractmethod
-    def chat_completions_create(self, model, messages):
+    def chat_completions_create(self, model, messages, **kwargs):
         """Abstract method for chat completion calls, to be implemented by each provider."""
         pass
+    
+    def _normalize_response(self, response_data):
+        """Normalize the API response to a common format (ChatCompletionResponse)."""
+        raise NotImplementedError("Response normalization not implemented.")
+    
+    def _normalize_parameters(self, **kwargs):
+        """Normalize parameters to a common format."""
+        raise NotImplementedError("Parameter normalization not implemented.")
 
 
 class ProviderFactory:
