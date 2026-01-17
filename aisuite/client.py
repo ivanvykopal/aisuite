@@ -52,6 +52,7 @@ class Client:
         self.param_validator = ParamValidator(extra_param_mode)
         self._chat = None
         self._audio = None
+        self._batches = None
 
     def _initialize_providers(self):
         """Helper method to initialize or update providers."""
@@ -91,6 +92,13 @@ class Client:
         if not self._chat:
             self._chat = Chat(self)
         return self._chat
+    
+    @property
+    def batches(self):
+        """Return the batches API interface (alias for chat)."""
+        if not self._batches:
+            self._batches = ChatBatches(self)
+        return self._batches
 
     @property
     def audio(self):
@@ -290,11 +298,7 @@ class Completions:
         response.choices[0].intermediate_messages = intermediate_messages
         return response
 
-    def create(self, model: str, messages: list, **kwargs):
-        """
-        Create chat completion based on the model, messages, and any extra arguments.
-        Supports automatic tool execution when max_turns is specified.
-        """
+    def _get_provider(self, model: str):
         # Check that correct format is used
         if ":" not in model:
             raise ValueError(
@@ -325,6 +329,16 @@ class Completions:
         if not provider:
             raise ValueError(f"Could not load provider for '{provider_key}'.")
 
+        return provider, model_name
+    
+    def create(self, model: str, messages: list, **kwargs):
+        """
+        Create chat completion based on the model, messages, and any extra arguments.
+        Supports automatic tool execution when max_turns is specified.
+        """
+        # Get provider and model name
+        provider, model_name = self._get_provider(model)
+        
         # Extract tool-related parameters
         max_turns = kwargs.pop("max_turns", None)
         tools = kwargs.pop("tools", None)
@@ -354,6 +368,42 @@ class Completions:
             # Delegate the chat completion to the correct provider's implementation
             response = provider.chat_completions_create(model_name, messages, **kwargs)
             return self._extract_thinking_content(response)
+
+
+class ChatBatches(Completions):
+    def __init__(self, client: "Client"):
+        self.client = client
+        
+    def _process_mcp_configs(self, tools):
+        raise NotImplementedError(
+            "MCP tool processing not implemented for batch chat completions yet."
+        )
+    
+    def _tool_runner(
+        self,
+        provider,
+        model_name: str,
+        messages: list,
+        tools: Any,
+        max_turns: int,
+        **kwargs,
+    ):
+        raise NotImplementedError(
+            "Tool execution loop not implemented for batch chat completions yet."
+        )
+        
+    def create(self, model: str, conversations: list, **kwargs):
+        """
+        Create chat completion batches (not implemented yet).
+        """
+        # Get provider and model name
+        provider, model_name = self._get_provider(model)
+        
+        responses = provider.batches_create(model_name, conversations, **kwargs)
+        responses = [
+            self._extract_thinking_content(response) for response in responses
+        ]
+        return responses
 
 
 class Audio:

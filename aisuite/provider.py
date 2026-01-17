@@ -4,7 +4,6 @@ import importlib
 import os
 import functools
 from typing import Union, BinaryIO, Optional
-from aisuite.utils.config import Config
 
 
 class LLMError(Exception):
@@ -29,6 +28,11 @@ class Provider(ABC):
     @abstractmethod
     def chat_completions_create(self, model, messages, **kwargs):
         """Abstract method for chat completion calls, to be implemented by each provider."""
+        pass
+    
+    @abstractmethod
+    def batches_create(self, model, conversations, **kwargs):
+        """Abstract method for batch processing calls, to be implemented by each provider."""
         pass
     
     def _normalize_response(self, response_data):
