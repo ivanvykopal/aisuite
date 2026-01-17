@@ -29,16 +29,16 @@ class Provider(ABC):
     def chat_completions_create(self, model, messages, **kwargs):
         """Abstract method for chat completion calls, to be implemented by each provider."""
         pass
-    
+
     @abstractmethod
     def batches_create(self, model, conversations, **kwargs):
         """Abstract method for batch processing calls, to be implemented by each provider."""
         pass
-    
+
     def _normalize_response(self, response_data):
         """Normalize the API response to a common format (ChatCompletionResponse)."""
         raise NotImplementedError("Response normalization not implemented.")
-    
+
     def _normalize_parameters(self, **kwargs):
         """Normalize parameters to a common format."""
         raise NotImplementedError("Parameter normalization not implemented.")

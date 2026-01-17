@@ -92,7 +92,7 @@ class Client:
         if not self._chat:
             self._chat = Chat(self)
         return self._chat
-    
+
     @property
     def batches(self):
         """Return the batches API interface (alias for chat)."""
@@ -330,7 +330,7 @@ class Completions:
             raise ValueError(f"Could not load provider for '{provider_key}'.")
 
         return provider, model_name
-    
+
     def create(self, model: str, messages: list, **kwargs):
         """
         Create chat completion based on the model, messages, and any extra arguments.
@@ -338,7 +338,7 @@ class Completions:
         """
         # Get provider and model name
         provider, model_name = self._get_provider(model)
-        
+
         # Extract tool-related parameters
         max_turns = kwargs.pop("max_turns", None)
         tools = kwargs.pop("tools", None)
@@ -373,12 +373,12 @@ class Completions:
 class ChatBatches(Completions):
     def __init__(self, client: "Client"):
         self.client = client
-        
+
     def _process_mcp_configs(self, tools):
         raise NotImplementedError(
             "MCP tool processing not implemented for batch chat completions yet."
         )
-    
+
     def _tool_runner(
         self,
         provider,
@@ -391,18 +391,16 @@ class ChatBatches(Completions):
         raise NotImplementedError(
             "Tool execution loop not implemented for batch chat completions yet."
         )
-        
+
     def create(self, model: str, conversations: list, **kwargs):
         """
         Create chat completion batches (not implemented yet).
         """
         # Get provider and model name
         provider, model_name = self._get_provider(model)
-        
+
         responses = provider.batches_create(model_name, conversations, **kwargs)
-        responses = [
-            self._extract_thinking_content(response) for response in responses
-        ]
+        responses = [self._extract_thinking_content(response) for response in responses]
         return responses
 
 

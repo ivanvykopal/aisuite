@@ -1,15 +1,19 @@
 from pydantic import BaseModel, ConfigDict
 from typing import Any, Dict, Union, Optional, List
+
 # I need to define the standard structure for the kwargs for the chat_completions_create, it should use OpenAI chat completion parameters as reference.
+
 
 class AudioID(BaseModel):
     """Configuration class for unique audio voice identifiers."""
+
     id: str
 
 
 class AudioConfig(BaseModel):
     """Configuration class for audio-specific parameters."""
-    format: str = None # wav, mp3, flac, opus, pcm16
+
+    format: str = None  # wav, mp3, flac, opus, pcm16
     voice: Union[str, AudioID] = None
 
 
@@ -38,12 +42,13 @@ class UserLocation(BaseModel):
 class WebSearchOptions(BaseModel):
     search_context_size: Optional[str] = None  # e.g., "low", "medium", "high"
     user_location: Optional[UserLocation] = None
-    
+
 
 class Config(BaseModel):
     """Configuration class for chat completion parameters."""
+
     model_config = ConfigDict(extra="forbid")
-    
+
     """OpenAI Compatible"""
     audio: Optional[AudioConfig] = None
     frequency_penalty: float = 0.0
@@ -55,10 +60,12 @@ class Config(BaseModel):
     n: Optional[int] = 1
     parallel_tool_calls: Optional[bool] = False
     prediction: Optional[str] = None
-    presence_penalty: Optional[float] = 0.0 # -2.0 to 2.0
+    presence_penalty: Optional[float] = 0.0  # -2.0 to 2.0
     prompt_cache_key: Optional[str] = None
-    prompt_cache_retention: Optional[str] = None # e.g., "24h"
-    reasoning_effort: Optional[str] = None # e.g., "none", "minimal", "low", "medium", "high", and "xhigh"
+    prompt_cache_retention: Optional[str] = None  # e.g., "24h"
+    reasoning_effort: Optional[str] = (
+        None  # e.g., "none", "minimal", "low", "medium", "high", and "xhigh"
+    )
     response_format: Optional[dict] = None
     safety_identifier: Optional[str] = None
     stop: Optional[Union[str, List[str]]] = None
@@ -70,9 +77,9 @@ class Config(BaseModel):
     tools: Optional[List[str]] = None
     top_logprobs: Optional[int] = None
     top_p: Optional[float] = 1.0
-    verbosity: Optional[str] = None # e.g., "none", "low", "medium", "high"
+    verbosity: Optional[str] = None  # e.g., "none", "low", "medium", "high"
     web_search_options: Optional[Dict[str, Any]] = None
-    
+
     """VLLM Specific"""
     quantization: Optional[str] = None  # e.g., "bitsandbytes", "fp16"
     top_k: Optional[int] = None
@@ -82,4 +89,3 @@ class Config(BaseModel):
     seed: Optional[int] = None
     min_tokens: Optional[int] = None
     skip_special_tokens: Optional[bool] = True
-    

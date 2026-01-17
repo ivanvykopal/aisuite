@@ -36,7 +36,7 @@ class OpenaiProvider(Provider):
         # Initialize audio functionality
         super().__init__()
         self.audio = OpenAIAudio(self.client)
-        
+
     def _normalize_parameters(self, **kwargs):
         config = Config(**kwargs)
         return {
