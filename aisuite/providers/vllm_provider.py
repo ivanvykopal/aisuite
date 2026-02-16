@@ -9,18 +9,24 @@ class VllmProvider(Provider):
     def __init__(self):
         self.llm = None
 
-    def load_llm(self, model_name: str, quanization: str = None):
+    def load_llm(
+        self, model_name: str, quanization: str = None, max_model_len: int = None
+    ):
         if self.llm is None:
-            if quanization:
-                self.llm = LLM(model_name, quantization=quanization)
-            else:
-                self.llm = LLM(model_name)
+            kwargs = {}
+            if quantization:
+                kwargs["quantization"] = quantization
+            if max_model_len:
+                kwargs["max_model_len"] = max_model_len
+
+            self.llm = LLM(model_name, **kwargs)
 
     def _normalize_parameters(self, **kwargs):
         config = Config(**kwargs)
 
         return {
             "quantization": config.quantization,
+            "max_model_len": config.max_model_len,
             "n": config.n,
             "best_of": config.best_of,
             "presence_penalty": config.presence_penalty,
@@ -43,7 +49,7 @@ class VllmProvider(Provider):
 
     def _chat(self, model, messages, **kwargs):
         params = self._normalize_parameters(**kwargs)
-        self.load_llm(model, params.pop("quantization"))
+        self.load_llm(model, params.pop("quantization"), params.pop("max_model_len"))
 
         sampling_params = self.llm.get_default_sampling_params()
         for key, value in params.items():

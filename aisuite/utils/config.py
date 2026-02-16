@@ -82,6 +82,7 @@ class Config(BaseModel):
 
     """VLLM Specific"""
     quantization: Optional[str] = None  # e.g., "bitsandbytes", "fp16"
+    max_model_len: Optional[int] = None
     top_k: Optional[int] = None
     repetition_penalty: Optional[float] = None
     best_of: Optional[int] = None
