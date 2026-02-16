@@ -10,7 +10,7 @@ class VllmProvider(Provider):
         self.llm = None
 
     def load_llm(
-        self, model_name: str, quanization: str = None, max_model_len: int = None
+        self, model_name: str, quantization: str = None, max_model_len: int = None
     ):
         if self.llm is None:
             kwargs = {}
