@@ -30,10 +30,11 @@ class Provider(ABC):
         """Abstract method for chat completion calls, to be implemented by each provider."""
         pass
 
-    @abstractmethod
     def batches_create(self, model, conversations, **kwargs):
         """Abstract method for batch processing calls, to be implemented by each provider."""
-        pass
+        raise NotImplementedError(
+            "Batch processing is not implemented for OpenAI provider yet."
+        )
 
     def _normalize_response(self, response_data):
         """Normalize the API response to a common format (ChatCompletionResponse)."""
